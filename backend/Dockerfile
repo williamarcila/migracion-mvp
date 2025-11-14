@@ -1,5 +1,19 @@
 FROM php:8.2-apache
 
+# Instala dependencias + PostgreSQL dev
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libpq-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql \
+    && rm -rf /var/lib/apt/lists/*
+
 # Instala dependencias
 RUN apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev zip unzip git curl \
