@@ -11,13 +11,13 @@ RUN a2enmod rewrite
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# WORKDIR = backend (donde está todo)
+# WORKDIR = raíz del backend
 WORKDIR /var/www/html
 
-# Copia TODO el backend directamente
+# Copia TODO el backend
 COPY backend/ .
 
-# Instala dependencias
+# Instala dependencias (composer.json ya está copiado)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Laravel
