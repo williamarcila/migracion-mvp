@@ -20,7 +20,7 @@ COPY backend/ .
 # Instala dependencias (composer.json ya está copiado)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Laravel
+# Laravel: artisan ya está disponible
 RUN php artisan key:generate --no-interaction --force \
     && php artisan config:cache \
     && php artisan route:cache \
