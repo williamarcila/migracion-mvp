@@ -1,46 +1,35 @@
 FROM php:8.2-apache
 
-# Instala dependencias + PostgreSQL dev
+# Dependencias
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libpq-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql \
+    libpq-dev zip unzip git curl \
+    && docker-php-ext-install pdo pdo_pgsql \
     && rm -rf /var/lib/apt/lists/*
 
-# Habilita mod rewrite
+# Mod rewrite
 RUN a2enmod rewrite
 
-# Instala Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Directorio de trabajo
+# Directorio
 WORKDIR /var/www/html
 
-# COPIA PRIMERO composer.json para caché (sin scripts)
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction
+# Solo composer.json
+COPY composer.json ./
 
-# AHORA COPIA TODO EL CÓDIGO (incluyendo artisan)
+# Instala (genera lock internamente)
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Copia código
 COPY . .
 
-# EJECUTA SCRIPTS DE COMPOSER (ahora artisan existe)
-RUN composer run-script post-autoload-dump
-
-# Genera clave Laravel (AHORA SÍ funciona)
+# Laravel
+RUN composer dump-autoload
 RUN php artisan key:generate --no-interaction --force
 
 # Permisos
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Expone puerto
 EXPOSE 80
-
-# Start command
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
