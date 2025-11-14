@@ -1,8 +1,7 @@
 FROM php:8.2-apache
 
 # Dependencias
-RUN apt-get update && apt-get install -y \
-    libpq-dev zip unzip git curl \
+RUN apt-get update && apt-get install -y libpq-dev zip unzip git curl \
     && docker-php-ext-install pdo pdo_pgsql \
     && rm -rf /var/lib/apt/lists/*
 
@@ -15,18 +14,20 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Directorio
 WORKDIR /var/www/html
 
-# Solo composer.json
+# Copia solo composer.json
 COPY composer.json ./
 
-# Instala (genera lock internamente)
+# Instala dependencias
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Copia código
+# Copia TODO el código
 COPY . .
 
-# Laravel
-RUN composer dump-autoload
-RUN php artisan key:generate --no-interaction --force
+# Laravel: artisan está en la raíz
+RUN php artisan key:generate --no-interaction --force \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
 # Permisos
 RUN chown -R www-data:www-data storage bootstrap/cache
