@@ -8,17 +8,17 @@
       "name": "backend",
       "source": {
         "type": "path",
-        "path": "./backend"
+        "path": "backend"
       },
-      "dockerfilePath": "./backend/Dockerfile"
+      "dockerfilePath": "backend/Dockerfile"
     },
     {
       "name": "frontend",
       "source": {
         "type": "path",
-        "path": "./frontend"
+        "path": "frontend"
       },
-      "dockerfilePath": "./frontend/Dockerfile"
+      "dockerfilePath": "frontend/Dockerfile"
     }
   ]
 }
