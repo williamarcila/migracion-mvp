@@ -1,0 +1,26 @@
+node_modules
+vendor
+.env
+storage/*.key
+storage/logs/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/cache/*
+bootstrap/cache/*.php
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+
+# Docker
+Dockerfile
+docker-entrypoint.sh
+.dockerignore
+
+# Tests
+tests
+phpunit.xml
