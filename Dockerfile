@@ -12,7 +12,7 @@ RUN a2enmod rewrite
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # WORKDIR = backend
-WORKDIR /var/www/html
+WORKDIR /var/www/html/backend
 
 # Copia composer.json
 COPY backend/composer.json ./
@@ -23,7 +23,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Copia TODO el backend
 COPY backend/ .
 
-# Laravel
+# Laravel: artisan está en /backend
 RUN php artisan key:generate --no-interaction --force \
     && php artisan config:cache \
     && php artisan route:cache \
@@ -32,5 +32,8 @@ RUN php artisan key:generate --no-interaction --force \
 # Permisos
 RUN chown -R www-data:www-data storage bootstrap/cache
 
+# DocumentRoot = public
+RUN sed -i 's|/var/www/html|/var/www/html/backend/public|g' /etc/apache2/sites-available/000-default.conf
+
 EXPOSE 80
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
+CMD ["apache2-foreground"]
